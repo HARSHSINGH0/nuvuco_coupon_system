@@ -6,7 +6,7 @@ export async function POST(req) {
     const body = await req.json();
 
     // 1. Get credentials from environment variables
-    const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY?.split('\\n').join('\n');
     const GOOGLE_CLIENT_EMAIL = process.env.GOOGLE_CLIENT_EMAIL;
     const SHEET_ID_1 = '1OZUgBc6RoR206QuEzOAWVKY3t_nzlsMG3b6f6RdTpQk'; // Sheet1 (Nuvoco Coupon Distribution)
     const SHEET_ID_2 = '1uw7abz2I7212Y_cIiXgylT3JOrdB5xdmlv1Dqnrnda0'; // Sheet2 (Telegram Chatid NUVUCO)
