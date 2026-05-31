@@ -114,17 +114,17 @@ export async function POST(req) {
 
       // All checks passed – stage for append
       rowsToAppend.push([
-          name,
-          dept,
-          isContractorGlobal ? globalContractor : contractor,
-          pno,
-          appreciated_for,
-          appreciated_by,
-          award_type,
-          month,
-          year,
-          monthYear,
-        ]);
+        name,
+        dept,
+        isContractorGlobal ? globalContractor : contractor,
+        pno,
+        appreciated_for,
+        appreciated_by,
+        award_type,
+        month,
+        year,
+        monthYear,
+      ]);
 
 
       // Update in‑memory counters for subsequent entries in same bulk
