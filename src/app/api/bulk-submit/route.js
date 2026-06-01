@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
+import crypto from 'crypto'; // Used for generating unique random tokens
 
 export async function POST(req) {
   try {
@@ -30,10 +31,10 @@ export async function POST(req) {
     });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Load existing rows once
+    // Load existing rows once - Extended range to A:L to capture Token & Date columns
     const sheet1Data = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID_1,
-      range: 'Sheet1!A:J',
+      range: 'Sheet1!A:L',
     });
     const existingRows = sheet1Data.data.values || [];
 
@@ -43,9 +44,12 @@ export async function POST(req) {
     });
     const chatMapping = sheet2Data.data.values || [];
 
+    // All times in IST (UTC+5:30)
     const now = new Date();
-    const month = now.toLocaleString('default', { month: 'long' });
-    const year = now.getFullYear().toString();
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istNow = new Date(now.getTime() + istOffset);
+    const month = istNow.toLocaleString('en-IN', { month: 'long', timeZone: 'Asia/Kolkata' });
+    const year = istNow.getUTCFullYear().toString();
     const monthYear = `${month} ${year}`;
 
     const normalizePhone = (num) => {
@@ -54,15 +58,11 @@ export async function POST(req) {
       return clean.length >= 10 ? clean.slice(-10) : clean;
     };
 
-    // Helper maps for fast lookup
-    const phoneMonthSet = new Set(); // "phone|monthYear"
     const deptCountMap = {};
     for (let i = 1; i < existingRows.length; i++) {
       const r = existingRows[i];
-      const p = r[3]; // phone column D
-      const d = r[1]; // dept column B
+      const d = r[1];  // dept column B
       const my = r[9]; // monthYear column J
-      if (p) phoneMonthSet.add(`${normalizePhone(p)}|${my}`);
       if (my === monthYear) {
         deptCountMap[d] = (deptCountMap[d] || 0) + 1;
       }
@@ -88,12 +88,6 @@ export async function POST(req) {
 
       const normalizedPno = normalizePhone(pno);
 
-      // Duplicate phone check for the same month
-      if (phoneMonthSet.has(`${normalizedPno}|${monthYear}`)) {
-        results.push({ name, message: 'Phone already submitted for this month.' });
-        continue;
-      }
-
       // Department limit check (including this entry)
       const currentDeptCount = deptCountMap[dept] || 0;
       if (currentDeptCount >= 100) {
@@ -112,7 +106,12 @@ export async function POST(req) {
         continue;
       }
 
-      // All checks passed – stage for append
+      // Generate token and IST timestamp for this entry
+      const entryIstNow = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+      const currentDateTime = entryIstNow.toISOString().replace('T', ' ').substring(0, 19);
+      const randomToken = `NUV-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+
+      // All checks passed – stage for append (Includes Token as K and Date as L)
       rowsToAppend.push([
         name,
         dept,
@@ -124,37 +123,45 @@ export async function POST(req) {
         month,
         year,
         monthYear,
+        randomToken,     // Column K
+        currentDateTime  // Column L
       ]);
 
-
-      // Update in‑memory counters for subsequent entries in same bulk
-      phoneMonthSet.add(`${pno}|${monthYear}`);
+      // Update in-memory counters for subsequent entries in same bulk
       deptCountMap[dept] = (deptCountMap[dept] || 0) + 1;
 
       // Send telegram notification
-      if (TELEGRAM_BOT_TOKEN) {
+      if (TELEGRAM_BOT_TOKEN && chatId) {
         const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        const text = `New Reward Submitted!\n\nCongratulations ${name}!\nYou have received a ${award_type.toUpperCase()} award.\nAppreciated by: ${appreciated_by}\nFor: ${appreciated_for} (${monthYear})`;
+        const text = `🎉 New Reward Submitted!\n\nCongratulations ${name}!\nYou have received Rs 100 ${award_type.toUpperCase()} award.\nAppreciated by: ${appreciated_by}\nFor: ${appreciated_for} (${monthYear})\n\n🎟️ Coupon Token: ${randomToken}\n📅 Generated On: ${currentDateTime}`;
         try {
-          await fetch(telegramUrl, {
+          const tgRes = await fetch(telegramUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chat_id: chatId, text }),
           });
+          const tgJson = await tgRes.json();
+          if (!tgJson.ok) {
+            console.error(`Telegram API error for ${name}:`, JSON.stringify(tgJson));
+          } else {
+            console.log(`Telegram message sent to chatId ${chatId} for ${name}`);
+          }
         } catch (e) {
-          // Telegram failure should not block whole bulk – record it
-          results.push({ name, status: 'partial', reason: 'Telegram message failed.' });
+          console.error(`Telegram fetch failed for ${name}:`, e);
         }
+      } else {
+        console.warn(`Telegram skipped for ${name} — missing bot token or chatId.`);
       }
 
-      results.push({ name, status: 'added', reason: 'Successfully added.' });
+      // Include token and dateTime properties in individual result response items
+      results.push({ name, status: 'added', reason: 'Successfully added.', token: randomToken, dateTime: currentDateTime });
     }
 
     // Append all successful rows in one batch (if any)
     if (rowsToAppend.length > 0) {
       await sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID_1,
-        range: 'Sheet1!A:J',
+        range: 'Sheet1!A:L', // Extended from A:J to A:L
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: rowsToAppend },
       });

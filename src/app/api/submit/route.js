@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
+import crypto from 'crypto'; // Used for generating a secure random token
 
 export async function POST(req) {
   try {
@@ -26,11 +27,19 @@ export async function POST(req) {
 
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Date formatting
+    // Date and Token formatting — all times in IST (UTC+5:30)
     const now = new Date();
-    const month = now.toLocaleString('default', { month: 'long' });
-    const year = now.getFullYear().toString();
-    const monthYear = `${month} ${year}`; // e.g. "May 2026"
+    const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in ms
+    const istNow = new Date(now.getTime() + istOffset);
+    const month = istNow.toLocaleString('en-IN', { month: 'long', timeZone: 'Asia/Kolkata' });
+    const year = istNow.getUTCFullYear().toString();
+    const monthYear = `${month} ${year}`; // e.g. "June 2026"
+
+    // Formats date as YYYY-MM-DD HH:MM:SS in IST
+    const currentDateTime = istNow.toISOString().replace('T', ' ').substring(0, 19);
+
+    // Generates a random 8-character uppercase alphanumeric token (e.g., "NUV-A1B2C3")
+    const randomToken = `NUV-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 
     // Prepare data
     const rowData = {
@@ -43,42 +52,23 @@ export async function POST(req) {
       award_type: body.award_type,
       month,
       year,
-      monthYear
+      monthYear,
+      token: randomToken,       // New field
+      dateTime: currentDateTime  // New field
     };
 
     // --- LOGIC FROM N8N ---
-    // Duplicate check moved below after fetching sheet data
     // 2. Check Sheet 1 for limits (100 limit per department per monthYear)
-
-    // 2. Check Sheet 1 for limits (100 limit per department per monthYear)
-    // We fetch all rows in Sheet1 to filter.
+    // Range extended to A:L to account for Token and Date columns
     const sheet1Data = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID_1,
-      range: 'Sheet1!A:J', // Assuming columns are A to J
+      range: 'Sheet1!A:L',
     });
 
     const rows1 = sheet1Data.data.values || [];
     let count = 0;
-    // We skip index 0 if it's the header row, but we can just check all rows.
-    // 1. Check for duplicate entry (same phone in same month)
-    if (rowData.phone) {
-      const normalizePhone = (num) => {
-        if (!num) return '';
-        const clean = num.toString().replace(/\D/g, '');
-        return clean.length >= 10 ? clean.slice(-10) : clean;
-      };
-      const targetPhone = normalizePhone(rowData.phone);
-      for (let i = 1; i < rows1.length; i++) {
-        const r = rows1[i];
-        const rPhone = r[3]; // Phone column (D)
-        const rMonthYear = r[9]; // MonthYear column (J)
-        if (normalizePhone(rPhone) === targetPhone && rMonthYear === rowData.monthYear) {
-          return NextResponse.json({ message: "This phone number already has a submission for this month." }, { status: 400 });
-        }
-      }
-    }
 
-    // 2. Check department limit (100 per month)
+    // Check department limit (100 per month)
     for (let i = 1; i < rows1.length; i++) {
       const row = rows1[i];
       const rowDept = row[1];
@@ -92,7 +82,7 @@ export async function POST(req) {
       return NextResponse.json({ message: "This department has already reached the 100-limit." }, { status: 400 });
     }
 
-    // 3. Check Sheet 2 for Telegram chatid mapping (optional)
+    // 3. Check Sheet 2 for Telegram chatid mapping
     let chatId = null;
     if (rowData.phone) {
       const sheet2Data = await sheets.spreadsheets.values.get({
@@ -118,10 +108,10 @@ export async function POST(req) {
       }
     }
 
-    // 4. Append row to Sheet 1
+    // 4. Append row to Sheet 1 (Including Token as K and Date as L)
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID_1,
-      range: 'Sheet1!A:J',
+      range: 'Sheet1!A:L',
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [
@@ -135,7 +125,9 @@ export async function POST(req) {
             rowData.award_type,
             rowData.month,
             rowData.year,
-            rowData.monthYear
+            rowData.monthYear,
+            rowData.token,     // Column K
+            rowData.dateTime   // Column L
           ]
         ]
       }
@@ -144,7 +136,7 @@ export async function POST(req) {
     // 5. Send Telegram Message
     if (chatId && TELEGRAM_BOT_TOKEN) {
       const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-      const text = `New Reward Submitted!\n\nCongratulations ${rowData.name}!\nYou have received a ${rowData.award_type.toUpperCase()} award.\nAppreciated by: ${rowData.appreciated_by}\nFor: ${rowData.appreciated_for} for the month ${rowData.monthYear}`;
+      const text = `New Reward Submitted!\n\nCongratulations ${rowData.name}!\nYou have received Rs 100 ${rowData.award_type.toUpperCase()} award.\nAppreciated by: ${rowData.appreciated_by}\nFor: ${rowData.appreciated_for} for the month ${rowData.monthYear}\n\n🎟️ Coupon Token: ${rowData.token}\n📅 Generated On: ${rowData.dateTime}`;
 
       await fetch(telegramUrl, {
         method: 'POST',
@@ -158,7 +150,12 @@ export async function POST(req) {
       console.warn("Telegram bot token or Chat ID is missing, skipping telegram message.");
     }
 
-    return NextResponse.json({ message: "Form submitted successfully." }, { status: 200 });
+    // Returning token and datetime to pass metadata along the frontend/next flow
+    return NextResponse.json({
+      message: "Form submitted successfully.",
+      token: rowData.token,
+      dateTime: rowData.dateTime
+    }, { status: 200 });
 
   } catch (error) {
     console.error('API Error:', error);
