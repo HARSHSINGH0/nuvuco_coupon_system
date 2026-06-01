@@ -34,7 +34,7 @@ export async function POST(req) {
     // Load existing rows once - Extended range to A:L to capture Token & Date columns
     const sheet1Data = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID_1,
-      range: 'Sheet1!A:L',
+      range: 'Sheet1!A:M',
     });
     const existingRows = sheet1Data.data.values || [];
 
@@ -74,6 +74,7 @@ export async function POST(req) {
     for (const entry of entries) {
       const {
         name,
+        empid,
         contractor = '',
         pno,
         appreciated_for,
@@ -81,7 +82,7 @@ export async function POST(req) {
       } = entry;
 
       // Basic validation
-      if (!name || !dept || !pno || !appreciated_for || !award_type) {
+      if (!name || !dept || !pno || !appreciated_for || !award_type || !empid) {
         results.push({ name, message: 'Missing required fields.' });
         continue;
       }
@@ -124,7 +125,8 @@ export async function POST(req) {
         year,
         monthYear,
         randomToken,     // Column K
-        currentDateTime  // Column L
+        currentDateTime,  // Column L
+        empid
       ]);
 
       // Update in-memory counters for subsequent entries in same bulk
@@ -133,7 +135,7 @@ export async function POST(req) {
       // Send telegram notification
       if (TELEGRAM_BOT_TOKEN && chatId) {
         const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        const text = `🎉 New Reward Submitted!\n\nCongratulations ${name}!\nYou have received Rs 100 ${award_type.toUpperCase()} award.\nAppreciated by: ${appreciated_by}\nFor: ${appreciated_for} (${monthYear})\n\n🎟️ Coupon Token: ${randomToken}\n📅 Generated On: ${currentDateTime}`;
+        const text = `🎉 New Reward Submitted!\n\nCongratulations ${name}! Emp Id: ${empid}\nYou have received Rs 100 ${award_type.toUpperCase()} award.\nAppreciated by: ${appreciated_by}\nFor: ${appreciated_for} (${monthYear})\n\n🎟️ Coupon Token: ${randomToken}\n📅 Generated On: ${currentDateTime}`;
         try {
           const tgRes = await fetch(telegramUrl, {
             method: 'POST',
@@ -161,7 +163,7 @@ export async function POST(req) {
     if (rowsToAppend.length > 0) {
       await sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID_1,
-        range: 'Sheet1!A:L', // Extended from A:J to A:L
+        range: 'Sheet1!A:M', // Extended from A:J to A:L
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: rowsToAppend },
       });

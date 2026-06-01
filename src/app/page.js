@@ -216,7 +216,17 @@ export default function Home() {
                     required
                   />
                 </div>
-
+                <div className="input-group col-4">
+                  <label htmlFor={`empid-${row.id}`}>Employee ID</label>
+                  <input
+                    type="text"
+                    id={`empid-${row.id}`}
+                    value={row.empid}
+                    onChange={(e) => updateRow(row.id, 'empid', e.target.value)}
+                    placeholder="e.g. EMP123456"
+                    required
+                  />
+                </div>
                 <div className="input-group col-4">
                   <label htmlFor={`pno-${row.id}`}>P No. (Phone)</label>
                   <input
@@ -321,6 +331,10 @@ export default function Home() {
             <div className="input-group col-4">
               <label htmlFor="name">Employee Name</label>
               <input type="text" id="name" name="name" placeholder="John Doe" required />
+            </div>
+            <div className="input-group col-4">
+              <label htmlFor="empid">Employee ID</label>
+              <input type="text" id="empid" name="empid" placeholder="e.g. EMP123456" required />
             </div>
             <div className="input-group col-4">
               <label htmlFor="dept">Department</label>
