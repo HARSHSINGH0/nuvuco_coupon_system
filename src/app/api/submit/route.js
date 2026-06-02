@@ -39,7 +39,7 @@ export async function POST(req) {
     const currentDateTime = istNow.toISOString().replace('T', ' ').substring(0, 19);
 
     // Generates a random 8-character uppercase alphanumeric token (e.g., "NUV-A1B2C3")
-    const randomToken = `NUV-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+    const randomToken = `SCP-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 
     // Prepare data
     const rowData = {
@@ -55,7 +55,8 @@ export async function POST(req) {
       monthYear,
       token: randomToken,       // New field
       dateTime: currentDateTime,  // New field
-      employeeid: body.empid || ''
+      employeeid: body.empid || '',
+      appreciateddept: body.appreciateddept || ''
     };
 
     // --- LOGIC FROM N8N ---
@@ -63,7 +64,7 @@ export async function POST(req) {
     // Range extended to A:L to account for Token and Date columns
     const sheet1Data = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID_1,
-      range: 'Sheet1!A:M',
+      range: 'Sheet1!A:N',
     });
 
     const rows1 = sheet1Data.data.values || [];
@@ -112,7 +113,7 @@ export async function POST(req) {
     // 4. Append row to Sheet 1 (Including Token as K and Date as L)
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID_1,
-      range: 'Sheet1!A:M',
+      range: 'Sheet1!A:N',
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [
@@ -129,7 +130,8 @@ export async function POST(req) {
             rowData.monthYear,
             rowData.token,     // Column K
             rowData.dateTime,   // Column L
-            rowData.employeeid
+            rowData.employeeid,
+            rowData.appreciateddept
           ]
         ]
       }
@@ -138,7 +140,7 @@ export async function POST(req) {
     // 5. Send Telegram Message
     if (chatId && TELEGRAM_BOT_TOKEN) {
       const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-      const text = `New Reward Submitted!\n\nCongratulations ${rowData.name}! Emp Id: ${rowData.employeeid}\nYou have received Rs 100 ${rowData.award_type.toUpperCase()} award.\nAppreciated by: ${rowData.appreciated_by}\nFor: ${rowData.appreciated_for} for the month ${rowData.monthYear}\n\n🎟️ Coupon Token: ${rowData.token}\n📅 Generated On: ${rowData.dateTime}`;
+      const text = `New Reward Submitted!\n\nCongratulations ${rowData.name}! Emp Id: ${rowData.employeeid}\nYou have received Rs 100 ${rowData.award_type.toUpperCase()} award.\nAppreciated by: ${rowData.appreciated_by} Appreciator Dept: ${rowData.appreciateddept}\nFor: ${rowData.appreciated_for} for the month ${rowData.monthYear}\n\n🎟️ Coupon Token: ${rowData.token}\n📅 Generated On: ${rowData.dateTime}`;
 
       await fetch(telegramUrl, {
         method: 'POST',

@@ -7,6 +7,7 @@ export default function Home() {
   const [isBulk, setIsBulk] = useState(false);
   const [appreciatedBy, setAppreciatedBy] = useState('');
   const [dept, setDept] = useState('');
+  const [appreciateddept, setappreciateddept] = useState('');
   const [globalContractor, setGlobalContractor] = useState('');
   const [isContractorGlobal, setIsContractorGlobal] = useState(false);
   // duplicate removed
@@ -66,6 +67,7 @@ export default function Home() {
     setIsSubmitting(true);
     const payload = {
       appreciated_by: appreciatedBy,
+      appreciateddept: appreciateddept,
       dept: dept,
       isContractorGlobal,
       globalContractor,
@@ -95,6 +97,7 @@ export default function Home() {
         // reset bulk form
         setAppreciatedBy('');
         setDept('');
+        setappreciateddept('');
         setBulkEntries([
           { id: Date.now(), name: '', contractor: '', pno: '', appreciated_for: '', award_type: '' },
         ]);
@@ -133,7 +136,7 @@ export default function Home() {
 
           <div className="toggle-wrapper">
             <button type="button" onClick={() => setIsBulk(false)} className={`toggle-btn ${!isBulk ? 'active' : ''}`}>Single Submit</button>
-            <button type="button" onClick={() => setIsBulk(true)} className={`toggle-btn ${isBulk ? 'active' : ''}`}>Bulk Submit (HOD)</button>
+            <button type="button" onClick={() => setIsBulk(true)} className={`toggle-btn ${isBulk ? 'active' : ''}`}>Bulk Submit</button>
           </div>
 
           <div className="form-grid" style={{ marginTop: '15px' }}>
@@ -150,6 +153,32 @@ export default function Home() {
               />
             </div>
             <div className="input-group col-6">
+              <label htmlFor="appreciateddept">Appreciator Department</label>
+              <select
+                id="appreciateddept"
+                name="appreciateddept"
+                required
+                value={appreciateddept}
+                onChange={(e) => setappreciateddept(e.target.value)}
+              >
+                <option value="" disabled>Select Dept</option>
+                <option value="CPP/WHR">CPP/WHR</option>
+                <option value="E&amp;I">E&amp;I</option>
+                <option value="ESG">ESG</option>
+                <option value="Leap_o">LEAP O, New Works & Civil</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Mines">Mines</option>
+                <option value="Packing">Packing Plant</option>
+                <option value="Plant_Inventory">Plant Inventory</option>
+                <option value="Process">Process</option>
+                <option value="Production">Production</option>
+                <option value="Projects">Projects</option>
+                <option value="Quality">Quality Assurance</option>
+                <option value="Safety">Safety</option>
+              </select>
+            </div>
+            <div className="input-group col-6">
               <label htmlFor="dept">Department</label>
               <select
                 id="dept"
@@ -159,19 +188,20 @@ export default function Home() {
                 onChange={(e) => setDept(e.target.value)}
               >
                 <option value="" disabled>Select Dept</option>
-                <option value="Sales">Sales</option>
-                <option value="Production">Production</option>
+                <option value="CPP/WHR">CPP/WHR</option>
                 <option value="E&amp;I">E&amp;I</option>
-                <option value="HR">HR</option>
-                <option value="Safety">Safety</option>
+                <option value="ESG">ESG</option>
+                <option value="Leap_o">LEAP O, New Works & Civil</option>
+                <option value="Manufacturing">Manufacturing</option>
                 <option value="Mechanical">Mechanical</option>
                 <option value="Mines">Mines</option>
-                <option value="Packing">Packing</option>
-                <option value="Logistics">Logistics</option>
-                <option value="Quality">Quality</option>
-                <option value="Accounts">Accounts</option>
-                <option value="CPP/WHR">CPP/WHR</option>
-                <option value="Environment">Environment</option>
+                <option value="Packing">Packing Plant</option>
+                <option value="Plant_Inventory">Plant Inventory</option>
+                <option value="Process">Process</option>
+                <option value="Production">Production</option>
+                <option value="Projects">Projects</option>
+                <option value="Quality">Quality Assurance</option>
+                <option value="Safety">Safety</option>
               </select>
             </div>
             {/* Global Contractor Toggle */}
@@ -325,7 +355,7 @@ export default function Home() {
           </div>
           <div className="toggle-wrapper">
             <button type="button" onClick={() => setIsBulk(false)} className={`toggle-btn ${!isBulk ? 'active' : ''}`}>Single Submit</button>
-            <button type="button" onClick={() => setIsBulk(true)} className={`toggle-btn ${isBulk ? 'active' : ''}`}>Bulk Submit (HOD)</button>
+            <button type="button" onClick={() => setIsBulk(true)} className={`toggle-btn ${isBulk ? 'active' : ''}`}>Bulk Submit</button>
           </div>
           <div className="form-grid" style={{ marginTop: '15px' }}>
             <div className="input-group col-4">
@@ -340,19 +370,20 @@ export default function Home() {
               <label htmlFor="dept">Department</label>
               <select id="dept" name="dept" required defaultValue="">
                 <option value="" disabled>Select Dept</option>
-                <option value="Sales">Sales</option>
-                <option value="Production">Production</option>
+                <option value="CPP/WHR">CPP/WHR</option>
                 <option value="E&amp;I">E&amp;I</option>
-                <option value="HR">HR</option>
-                <option value="Safety">Safety</option>
+                <option value="ESG">ESG</option>
+                <option value="Leap_o">LEAP O, New Works & Civil</option>
+                <option value="Manufacturing">Manufacturing</option>
                 <option value="Mechanical">Mechanical</option>
                 <option value="Mines">Mines</option>
-                <option value="Packing">Packing</option>
-                <option value="Logistics">Logistics</option>
-                <option value="Quality">Quality</option>
-                <option value="Accounts">Accounts</option>
-                <option value="CPP/WHR">CPP/WHR</option>
-                <option value="Environment">Environment</option>
+                <option value="Packing">Packing Plant</option>
+                <option value="Plant_Inventory">Plant Inventory</option>
+                <option value="Process">Process</option>
+                <option value="Production">Production</option>
+                <option value="Projects">Projects</option>
+                <option value="Quality">Quality Assurance</option>
+                <option value="Safety">Safety</option>
               </select>
             </div>
             <div className="input-group col-4">
@@ -370,6 +401,26 @@ export default function Home() {
             <div className="input-group col-12">
               <label htmlFor="appreciated_by">Appreciated By</label>
               <input type="text" id="appreciated_by" name="appreciated_by" placeholder="Manager or Supervisor Name" required />
+            </div>
+            <div className="input-group col-4">
+              <label htmlFor="appreciateddept">Appreciator Department</label>
+              <select id="appreciateddept" name="appreciateddept" required defaultValue="">
+                <option value="" disabled>Select Dept</option>
+                <option value="CPP/WHR">CPP/WHR</option>
+                <option value="E&amp;I">E&amp;I</option>
+                <option value="ESG">ESG</option>
+                <option value="Leap_o">LEAP O, New Works & Civil</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Mines">Mines</option>
+                <option value="Packing">Packing Plant</option>
+                <option value="Plant_Inventory">Plant Inventory</option>
+                <option value="Process">Process</option>
+                <option value="Production">Production</option>
+                <option value="Projects">Projects</option>
+                <option value="Quality">Quality Assurance</option>
+                <option value="Safety">Safety</option>
+              </select>
             </div>
           </div>
           <div className="bottom-section">

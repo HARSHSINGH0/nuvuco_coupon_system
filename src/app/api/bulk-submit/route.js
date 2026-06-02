@@ -4,12 +4,15 @@ import crypto from 'crypto'; // Used for generating unique random tokens
 
 export async function POST(req) {
   try {
-    const { appreciated_by, dept, entries, isContractorGlobal, globalContractor } = await req.json(); // dept is global for all entries and contractor handling
+    const { appreciated_by, appreciateddept, dept, entries, isContractorGlobal, globalContractor } = await req.json(); // dept is global for all entries and contractor handling
     if (!Array.isArray(entries) || entries.length === 0) {
       return NextResponse.json({ message: 'No entries provided.' }, { status: 400 });
     }
     if (!dept) {
       return NextResponse.json({ message: 'Department (dept) is required.' }, { status: 400 });
+    }
+    if (!appreciateddept) {
+      return NextResponse.json({ message: 'Appreciator Department (appreciateddept) is required.' }, { status: 400 });
     }
     if (entries.length > 10) {
       return NextResponse.json({ message: 'Maximum 10 entries allowed per bulk submit.' }, { status: 400 });
@@ -34,7 +37,7 @@ export async function POST(req) {
     // Load existing rows once - Extended range to A:L to capture Token & Date columns
     const sheet1Data = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID_1,
-      range: 'Sheet1!A:M',
+      range: 'Sheet1!A:N',
     });
     const existingRows = sheet1Data.data.values || [];
 
@@ -110,7 +113,7 @@ export async function POST(req) {
       // Generate token and IST timestamp for this entry
       const entryIstNow = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
       const currentDateTime = entryIstNow.toISOString().replace('T', ' ').substring(0, 19);
-      const randomToken = `NUV-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+      const randomToken = `SCP-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 
       // All checks passed – stage for append (Includes Token as K and Date as L)
       rowsToAppend.push([
@@ -126,7 +129,8 @@ export async function POST(req) {
         monthYear,
         randomToken,     // Column K
         currentDateTime,  // Column L
-        empid
+        empid,
+        appreciateddept
       ]);
 
       // Update in-memory counters for subsequent entries in same bulk
@@ -135,7 +139,7 @@ export async function POST(req) {
       // Send telegram notification
       if (TELEGRAM_BOT_TOKEN && chatId) {
         const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        const text = `🎉 New Reward Submitted!\n\nCongratulations ${name}! Emp Id: ${empid}\nYou have received Rs 100 ${award_type.toUpperCase()} award.\nAppreciated by: ${appreciated_by}\nFor: ${appreciated_for} (${monthYear})\n\n🎟️ Coupon Token: ${randomToken}\n📅 Generated On: ${currentDateTime}`;
+        const text = `🎉 New Reward Submitted!\n\nCongratulations ${name}! Emp Id: ${empid}\nYou have received Rs 100 ${award_type.toUpperCase()} award.\nAppreciated by: ${appreciated_by} Appreciator Dept: ${appreciateddept}\nFor: ${appreciated_for} (${monthYear})\n\n🎟️ Coupon Token: ${randomToken}\n📅 Generated On: ${currentDateTime}`;
         try {
           const tgRes = await fetch(telegramUrl, {
             method: 'POST',
@@ -163,7 +167,7 @@ export async function POST(req) {
     if (rowsToAppend.length > 0) {
       await sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID_1,
-        range: 'Sheet1!A:M', // Extended from A:J to A:L
+        range: 'Sheet1!A:N', // Extended from A:J to A:L
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: rowsToAppend },
       });

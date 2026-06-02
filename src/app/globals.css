@@ -66,19 +66,20 @@ body {
   z-index: 0;
 }
 
-.coupon-container > * {
+.coupon-container>* {
   z-index: 1;
   position: relative;
 }
 
 @keyframes fadeIn {
   from {
-      opacity: 0;
-      transform: translateY(20px);
+    opacity: 0;
+    transform: translateY(20px);
   }
+
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -141,7 +142,7 @@ body {
 }
 
 .plant-title {
-  font-size: clamp(16px, 3vw, 20px);
+  font-size: clamp(16px, 3vw, 40px);
   font-weight: 800;
   letter-spacing: 5px;
   color: rgba(255, 255, 255, 0.7);
@@ -150,7 +151,7 @@ body {
 }
 
 .congrats-text {
-  font-size: clamp(36px, 6vw, 56px);
+  /* font-size: clamp(36px, 6vw, 56px); */
   font-weight: 800;
   background: linear-gradient(135deg, #34d399, #10b981);
   -webkit-background-clip: text;
@@ -172,7 +173,7 @@ body {
 
 .banner-text {
   color: #fff;
-  font-size: clamp(14px, 2vw, 18px);
+  /* font-size: clamp(14px, 2vw, 40px); */
   font-weight: 600;
   letter-spacing: 2.5px;
   text-transform: uppercase;
@@ -302,11 +303,11 @@ body {
   transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-.custom-radio:hover input ~ .radio-mark {
+.custom-radio:hover input~.radio-mark {
   border-color: #34d399;
 }
 
-.custom-radio input:checked ~ .radio-mark {
+.custom-radio input:checked~.radio-mark {
   border-color: #10b981;
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
@@ -324,14 +325,21 @@ body {
   transform: translate(-50%, -50%) scale(0);
 }
 
-.custom-radio input:checked ~ .radio-mark:after {
+.custom-radio input:checked~.radio-mark:after {
   display: block;
   animation: popInRadio 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 @keyframes popInRadio {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
 
 .custom-radio span.label {
@@ -444,22 +452,79 @@ body {
 }
 
 @media (max-width: 768px) {
-  .col-4 { grid-column: span 6; }
-  .col-8 { grid-column: span 12; }
-  .header { flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; }
-  .logo-box, .logo-right { position: relative; top: auto; left: auto; right: auto; transform: scale(0.85); margin: 0; }
-  .header-center { width: 100%; margin-top: 5px; order: 3; }
-  .banner { margin: 0 -20px 30px -20px; }
-  .bottom-section { flex-direction: column; gap: 30px; }
-  .submit-btn { width: 100%; justify-content: center; }
+  .col-4 {
+    grid-column: span 6;
+  }
+
+  .col-8 {
+    grid-column: span 12;
+  }
+
+  .header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .logo-box,
+  .logo-right {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: scale(0.85);
+    margin: 0;
+  }
+
+  .header-center {
+    width: 100%;
+    margin-top: 5px;
+    order: 3;
+  }
+
+  .banner {
+    margin: 0 -20px 30px -20px;
+  }
+
+  .bottom-section {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
-  .col-4, .col-6 { grid-column: span 12; }
-  .coupon-container { padding: 25px 20px; }
-  .congrats-text { font-size: clamp(16px, 7vw, 28px); letter-spacing: 0; }
-  .plant-title { font-size: clamp(12px, 4vw, 16px); letter-spacing: 3px; }
-  .checkbox-container { flex-direction: column; width: 100%; gap: 10px; }
+
+  .col-4,
+  .col-6 {
+    grid-column: span 12;
+  }
+
+  .coupon-container {
+    padding: 25px 20px;
+  }
+
+  .congrats-text {
+    /* font-size: clamp(16px, 7vw, 28px); */
+    letter-spacing: 0;
+  }
+
+  .plant-title {
+    font-size: clamp(12px, 4vw, 16px);
+    letter-spacing: 3px;
+  }
+
+  .checkbox-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
 }
 
 /* Inline toggle row layout for global contractor */
@@ -549,4 +614,3 @@ body {
 .bulk-row .action-btn.delete-btn {
   align-self: flex-start;
 }
-
