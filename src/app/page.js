@@ -162,20 +162,25 @@ export default function Home() {
                 onChange={(e) => setappreciateddept(e.target.value)}
               >
                 <option value="" disabled>Select Dept</option>
-                <option value="CPP/WHR">CPP/WHR</option>
-                <option value="E&amp;I">E&amp;I</option>
-                <option value="ESG">ESG</option>
-                <option value="Leap_o">LEAP O, New Works & Civil</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Mechanical">Mechanical</option>
-                <option value="Mines">Mines</option>
+                <option value="Civil_New_Works">Civil&amp;New Works</option>
+                <option value="HR">HR</option>
                 <option value="Packing">Packing Plant</option>
+                <option value="QA">QA</option>
                 <option value="Plant_Inventory">Plant Inventory</option>
-                <option value="Process">Process</option>
-                <option value="Production">Production</option>
-                <option value="Projects">Projects</option>
-                <option value="Quality">Quality Assurance</option>
                 <option value="Safety">Safety</option>
+                <option value="Finance">Finance</option>
+                <option value="Logistics">Logistics</option>
+                <option value="Operations">Operations</option>
+                <option value="Process">Process</option>
+                <option value="Environment">Environment</option>
+                {/* <option value="CSR">CSR</option> */}
+                <option value="CPP/WHR">CPP/WHR</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="E&amp;I">E&amp;I</option>
+                <option value="Production">Production</option>
+                <option value="Inspection_leap_o">Inspection&amp;Leap-o</option>
+                <option value="Mines">Mines</option>
+                <option value="IT">IT</option>
               </select>
             </div>
             <div className="input-group col-6">
@@ -188,20 +193,25 @@ export default function Home() {
                 onChange={(e) => setDept(e.target.value)}
               >
                 <option value="" disabled>Select Dept</option>
-                <option value="CPP/WHR">CPP/WHR</option>
-                <option value="E&amp;I">E&amp;I</option>
-                <option value="ESG">ESG</option>
-                <option value="Leap_o">LEAP O, New Works & Civil</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Mechanical">Mechanical</option>
-                <option value="Mines">Mines</option>
+                <option value="Civil_New_Works">Civil&amp;New Works</option>
+                <option value="HR">HR</option>
                 <option value="Packing">Packing Plant</option>
+                <option value="QA">QA</option>
                 <option value="Plant_Inventory">Plant Inventory</option>
-                <option value="Process">Process</option>
-                <option value="Production">Production</option>
-                <option value="Projects">Projects</option>
-                <option value="Quality">Quality Assurance</option>
                 <option value="Safety">Safety</option>
+                <option value="Finance">Finance</option>
+                <option value="Logistics">Logistics</option>
+                <option value="Operations">Operations</option>
+                <option value="Process">Process</option>
+                <option value="Environment">Environment</option>
+                {/* <option value="CSR">CSR</option> */}
+                <option value="CPP/WHR">CPP/WHR</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="E&amp;I">E&amp;I</option>
+                <option value="Production">Production</option>
+                <option value="Inspection_leap_o">Inspection&amp;Leap-o</option>
+                <option value="Mines">Mines</option>
+                <option value="IT">IT</option>
               </select>
             </div>
             {/* Global Contractor Toggle */}
@@ -370,20 +380,25 @@ export default function Home() {
               <label htmlFor="dept">Department</label>
               <select id="dept" name="dept" required defaultValue="">
                 <option value="" disabled>Select Dept</option>
-                <option value="CPP/WHR">CPP/WHR</option>
-                <option value="E&amp;I">E&amp;I</option>
-                <option value="ESG">ESG</option>
-                <option value="Leap_o">LEAP O, New Works & Civil</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Mechanical">Mechanical</option>
-                <option value="Mines">Mines</option>
+                <option value="Civil_New_Works">Civil&amp;New Works</option>
+                <option value="HR">HR</option>
                 <option value="Packing">Packing Plant</option>
+                <option value="QA">QA</option>
                 <option value="Plant_Inventory">Plant Inventory</option>
-                <option value="Process">Process</option>
-                <option value="Production">Production</option>
-                <option value="Projects">Projects</option>
-                <option value="Quality">Quality Assurance</option>
                 <option value="Safety">Safety</option>
+                <option value="Finance">Finance</option>
+                <option value="Logistics">Logistics</option>
+                <option value="Operations">Operations</option>
+                <option value="Process">Process</option>
+                <option value="Environment">Environment</option>
+                {/* <option value="CSR">CSR</option> */}
+                <option value="CPP/WHR">CPP/WHR</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="E&amp;I">E&amp;I</option>
+                <option value="Production">Production</option>
+                <option value="Inspection_leap_o">Inspection&amp;Leap-o</option>
+                <option value="Mines">Mines</option>
+                <option value="IT">IT</option>
               </select>
             </div>
             <div className="input-group col-4">
@@ -406,20 +421,25 @@ export default function Home() {
               <label htmlFor="appreciateddept">Appreciator Department</label>
               <select id="appreciateddept" name="appreciateddept" required defaultValue="">
                 <option value="" disabled>Select Dept</option>
-                <option value="CPP/WHR">CPP/WHR</option>
-                <option value="E&amp;I">E&amp;I</option>
-                <option value="ESG">ESG</option>
-                <option value="Leap_o">LEAP O, New Works & Civil</option>
-                <option value="Manufacturing">Manufacturing</option>
-                <option value="Mechanical">Mechanical</option>
-                <option value="Mines">Mines</option>
+                <option value="Civil_New_Works">Civil&amp;New Works</option>
+                <option value="HR">HR</option>
                 <option value="Packing">Packing Plant</option>
+                <option value="QA">QA</option>
                 <option value="Plant_Inventory">Plant Inventory</option>
-                <option value="Process">Process</option>
-                <option value="Production">Production</option>
-                <option value="Projects">Projects</option>
-                <option value="Quality">Quality Assurance</option>
                 <option value="Safety">Safety</option>
+                <option value="Finance">Finance</option>
+                <option value="Logistics">Logistics</option>
+                <option value="Operations">Operations</option>
+                <option value="Process">Process</option>
+                <option value="Environment">Environment</option>
+                {/* <option value="CSR">CSR</option> */}
+                <option value="CPP/WHR">CPP/WHR</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="E&amp;I">E&amp;I</option>
+                <option value="Production">Production</option>
+                <option value="Inspection_leap_o">Inspection&amp;Leap-o</option>
+                <option value="Mines">Mines</option>
+                <option value="IT">IT</option>
               </select>
             </div>
           </div>

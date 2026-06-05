@@ -59,9 +59,40 @@ export async function POST(req) {
       appreciateddept: body.appreciateddept || ''
     };
 
-    // --- LOGIC FROM N8N ---
-    // 2. Check Sheet 1 for limits (100 limit per department per monthYear)
-    // Range extended to A:L to account for Token and Date columns
+    // --- Per-department coupon limits (Actual Nos from Excel) ---
+    const DEPT_LIMITS = {
+      'Civil_New_Works':   10,
+      'HR':                10,
+      'Packing':           10,
+      'QA':                10,
+      'Plant_Inventory':   10,
+      'Safety':            10,
+      'Finance':           10,
+      'Logistics':         10,
+      'Operations':        10,
+      'Process':            5,
+      'Environment':        5,
+      'CSR':                0,
+      'CPP/WHR':           10,
+      'Mechanical':        10,
+      'E&I':               10,
+      'Production':        10,
+      'Inspection_leap_o': 10,
+      'Mines':             10,
+      'IT':                 5,
+    };
+
+    // Get the limit for the submitted department (default to 0 if unknown dept)
+    const deptLimit = DEPT_LIMITS.hasOwnProperty(rowData.dept)
+      ? DEPT_LIMITS[rowData.dept]
+      : 0;
+
+    // Block submission immediately if department has a 0 limit (e.g. CSR)
+    if (deptLimit === 0) {
+      return NextResponse.json({ message: `The ${rowData.dept} department is not eligible for coupon distribution.` }, { status: 400 });
+    }
+
+    // 2. Check Sheet 1 for current month usage against the department's limit
     const sheet1Data = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID_1,
       range: 'Sheet1!A:N',
@@ -70,7 +101,7 @@ export async function POST(req) {
     const rows1 = sheet1Data.data.values || [];
     let count = 0;
 
-    // Check department limit (100 per month)
+    // Count existing submissions for this dept in the current month
     for (let i = 1; i < rows1.length; i++) {
       const row = rows1[i];
       const rowDept = row[1];
@@ -80,8 +111,8 @@ export async function POST(req) {
       }
     }
 
-    if (count >= 100) {
-      return NextResponse.json({ message: "This department has already reached the 100-limit." }, { status: 400 });
+    if (count >= deptLimit) {
+      return NextResponse.json({ message: `The ${rowData.dept} department has already reached its ${deptLimit}-coupon limit for ${rowData.monthYear}.` }, { status: 400 });
     }
 
     // 3. Check Sheet 2 for Telegram chatid mapping
